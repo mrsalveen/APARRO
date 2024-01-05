@@ -28,7 +28,6 @@ INITIAL_PROMPT = textwrap.dedent("""
         "quantity": 2,  # Adjust the quantity as needed
         "comment": "Add extra cheese"
     }}
-    Remark: DO NOT TRUNCATE YOUR ANSWER, IT SHOULD BE A PROPER JSON FILE WITHOUT 3 dots like the following:...
     Now please find the order below inside backtics and return order in the proper JSON format
 """)
 logging.basicConfig(level=logging.INFO)
@@ -114,7 +113,7 @@ class Waiter:
         unavailable_str = ", ".join(self._unavailable)
         result_str = ""
         if ordered_items:
-            result_str += f"Your order is: {ordered_str}\n"
+            result_str += f"{ordered_str}\n"
         else:
             result_str += "Sorry, there is nothing in our menu which you ordered\n"
         if unavailable_items:

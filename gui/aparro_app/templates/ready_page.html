@@ -22,10 +22,11 @@
             font-family: 'Inknut Antiqua', sans-serif;
         }
 
+            
         /* Container for buttons on the left */
         .button-container {
             position:absolute;
-            left: 400px; /* Adjust the left position as needed */
+            left: 10%; /* Adjust the left position as needed */
             top: 65%; /* Adjust the top position as needed */
             transform: translateY(-50%);
             display: flex;
@@ -37,13 +38,22 @@
         .button {
             position: relative;
             margin-bottom: 10px; /* Adjust the margin between buttons as needed */
-            padding: 30px 60px;
+            padding: 1vw 2vw; /* Adjust padding as needed */
+            width: 20vw; /* Fixed width for all buttons */
+            height: 5vh; /* Fixed height for all buttons */
             background-color: #BB3216; /* Adjust button background color */
             color: white;
             text-decoration: none;
-            font-size: 30px;
+            font-size: 1.5vw; /* Adjust font size as needed */
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 10px; /* Rounded corners */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
+
 
         h1 {
             font-size: 48px;
@@ -59,39 +69,91 @@
 
         /* Additional style for the label */
         #statusLabel {
-            font-size: 40px;
-            margin-top: 500px;
+            position: absolute;
+            top: 60%; /* Adjust as needed */
+            left: 40%; /* Adjust to move it more to the right */
+            transform: translateY(-50%);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 3vw;
+            /* Other styles... */
         }
         #orderResult {
             position: absolute;
-            right: 255px; /* Adjust as needed */
-            top: 35%;
+            right: 16vw; /* Adjust as needed */
+            top: 48%;
             transform: translateY(-50%);
             background-color: rgba(245,239,226,255);
             color: black;
             padding: 00px;
             border-radius: 0px;
             box-shadow: 0 0 0px rgba(0, 0, 0, 0);
-            width: 300px; /* Adjust width as needed */
-            max-height: 500px;
+            font-size: 2vw; /* Dynamic font size */
+            width: 19vw; /* Relative width */
+            max-height: 50vh; /* Relative maximum height */
             overflow-y: auto;
         }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 2vw;
+            height: 2vw;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loader {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 50%;
+            left: 43%;
+            transform: translate(-50%, -50%);
+            align-items: center;
+            z-index: 10; /* Make sure it's above other elements */
+        }
+
+        .blurred {
+            filter: blur(8px); /* Adjust the blur intensity as needed */
+        }
+
+        #mainContent {
+            position: relative;
+            width: 100%; /* Full width */
+            height: 100vh; /* Full viewport height */
+            /* More styles to ensure consistent layout */
+        }
+        
+
     </style>
 </head>
 <body>
-    <!-- Dark blue cover with text and "Ready" button -->
-    <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 255, 0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
-        <p style="color: white; font-size: 24px;">Please be ready to express your order</p>
-        <button id="readyButton" style="padding: 15px 30px; background-color: #BB3216; color: white; font-size: 18px; cursor: pointer;">Ready</button>
+
+    <div id="mainContent">
+        <!-- Dark blue cover with text and "Ready" button -->
+        <div id="cover" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 255, 0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1;">
+            <p style="color: white; font-size: 24px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Please be ready to express your order</p>
+            <button id="readyButton" style="padding: 15px 30px; background-color: #BB3216; color: white; font-size: 25px; cursor: pointer; border-radius: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Ready</button>
+        </div>
+
+        <!-- Your existing content -->
+        <div class="button-container">
+            <a href="#" class="button" id="pauseResumeButton">Pause</a>
+            <a href="#" class="button">Stop </a>
+        </div>
+        <p id="statusLabel"></p>
+        <div id="orderResult"></div>
+    </div>
+    <div id="loader" style="display: none; align-items: center;">
+        <div class="spinner"></div>
+        <span style="margin-left: 5px; font-size: 20px ; color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">Processing your Order</span>
     </div>
 
-    <!-- Your existing content -->
-    <div class="button-container">
-        <a href="#" class="button" id="pauseResumeButton">Pause</a>
-        <a href="#" class="button">Finish</a>
-    </div>
-    <p id="statusLabel"></p>
-    <div id="orderResult"></div>
+    
 
     <script>
         // JavaScript to handle button click and text change
@@ -125,8 +187,9 @@
             statusLabel.innerText = 'Listening';
         });
 
-        pauseResumeButton.addEventListener('click', function () {
-        if (mediaRecorder) {
+        const pauseResumeListener = function () {
+            if (mediaRecorder) {
+
             switch (mediaRecorder.state) {
                 case "recording":
                     mediaRecorder.pause();
@@ -136,16 +199,15 @@
                 case "paused":
                     mediaRecorder.resume();
                     pauseResumeButton.innerText = 'Pause';
-                    statusLabel.innerText = 'Recording...';
+                    statusLabel.innerText = 'Listening';
                     break;
             }
         }
-    });
+        };
 
+        const finishListener = function () {
+            if (mediaRecorder) {
 
-
-    finishButton.addEventListener('click', function () {
-        if (mediaRecorder) {
             // Stop the media recorder
             mediaRecorder.stop();
 
@@ -155,7 +217,8 @@
             }
 
             // Update UI or status if needed
-            statusLabel.innerText = 'Recording finished';
+            statusLabel.innerText = '';
+
 
             // Additional logic for handling the recorded data
             mediaRecorder.onstop = () => {
@@ -166,12 +229,21 @@
         } else {
             console.error("MediaRecorder not initialized");
         }
-    });
+        };
+
+        pauseResumeButton.addEventListener('click', pauseResumeListener);
+        
+        finishButton.addEventListener('click', finishListener);
+
 
 
         function sendData(audioBlob) {
             const formData = new FormData();
             formData.append('audio_data', audioBlob);
+
+            // Show the loader
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('mainContent').classList.add('blurred');
 
             fetch('/take-order/', {  // Update the URL as per your configuration
                 method: 'POST',
@@ -179,9 +251,31 @@
             })
             .then(response => response.json())
             .then(data => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('mainContent').classList.remove('blurred');
                 document.getElementById('orderResult').innerText = 'Order Result:\n' + data.order;
+
+                pauseResumeButton.innerText = 'Change Order';
+                pauseResumeButton.href = '/ready_page/'; 
+                pauseResumeButton.removeEventListener('click', pauseResumeListener);
+                pauseResumeButton.addEventListener('click', function() {
+                    window.location.href = '/ready_page/'; 
+                });
+
+                finishButton.innerText = 'Finish Order';
+                finishButton.href = '/';
+                finishButton.removeEventListener('click', finishListener); 
+                finishButton.addEventListener('click', function() {
+                    window.location.href = '/'; 
+                });
+
             })
-            .catch(error => console.error('Error:', error));
+
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('mainContent').classList.remove('blurred');
+            });
         }
     </script>
 
